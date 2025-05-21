@@ -6,30 +6,37 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env: # Workflow-level variables (available everywhere unless overridden)
+  SITE_FOLDER: _site
+  DOCKER_IMAGE: jekyll/builder:latest
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    env: # Job-level variables (available in all steps of this job unless overridden)
+      DEPLOY_BRANCH: gh-pages
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Build the site in the jekyll/builder container
+      env: # Step-level variable (only in this step)
+        JEKYLL_CMD: "jekyll build --future"
       run: |
         docker run \
-        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
-        jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
-        
+        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/${{ env.SITE_FOLDER }}:/srv/jekyll/${{ env.SITE_FOLDER }} \
+        ${{ env.DOCKER_IMAGE }} /bin/bash -c "chmod -R 777 /srv/jekyll && $JEKYLL_CMD"
 
     - name: Upload built site
       uses: actions/upload-artifact@v4
       with:
         name: site
-        path: _site
+        path: ${{ env.SITE_FOLDER }}
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.7.3
       with:
-        folder: _site
-        branch: gh-pages
+        folder: ${{ env.SITE_FOLDER }}
+        branch: ${{ env.DEPLOY_BRANCH }}
         commit-message: Deployment Successful...
-          
