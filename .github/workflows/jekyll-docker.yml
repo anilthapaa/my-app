@@ -24,10 +24,6 @@ jobs:
       env: # Step-level variable (only in this step)
         JEKYLL_CMD: "jekyll build --future"
       run: |
-        echo "Workflow-level variable SITE_FOLDER: $SITE_FOLDER"
-        echo "Workflow-level variable DOCKER_IMAGE: $DOCKER_IMAGE"
-        echo "Job-level variable DEPLOY_BRANCH: $DEPLOY_BRANCH"
-        echo "Step-level variable JEKYLL_CMD: $JEKYLL_CMD"
         docker run \
         -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/${{ env.SITE_FOLDER }}:/srv/jekyll/${{ env.SITE_FOLDER }} \
         ${{ env.DOCKER_IMAGE }} /bin/bash -c "chmod -R 777 /srv/jekyll && $JEKYLL_CMD"
@@ -37,22 +33,6 @@ jobs:
       with:
         name: site
         path: ${{ env.SITE_FOLDER }}
-
-    - name: Report build status - success
-      if: ${{ success() }}
-      run: |
-        echo "✅ Build succeeded!"
-        echo "SITE_FOLDER: $SITE_FOLDER"
-        echo "DOCKER_IMAGE: $DOCKER_IMAGE"
-        echo "DEPLOY_BRANCH: $DEPLOY_BRANCH"
-
-    - name: Report build status - failure
-      if: ${{ failure() }}
-      run: |
-        echo "❌ Build failed!"
-        echo "SITE_FOLDER: $SITE_FOLDER"
-        echo "DOCKER_IMAGE: $DOCKER_IMAGE"
-        echo "DEPLOY_BRANCH: $DEPLOY_BRANCH"
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.7.3
