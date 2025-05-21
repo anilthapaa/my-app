@@ -1,0 +1,30 @@
+name: Variable Scope Example
+
+on:
+  workflow_dispatch:
+
+env: # Workflow-level variables
+  MY_WORKFLOW_VARIABLE: "This is a workflow-level variable"
+
+jobs:
+  show-variable-scope:
+    name: Show Variable Scope
+    runs-on: ubuntu-latest
+
+    env: # Job-level variables
+      MY_JOB_VARIABLE: "This is a job-level variable"
+
+    steps:
+      - name: Show all variable values - Step 1
+        env:
+          MY_STEP_VARIABLE: "This is a step-level variable"
+        run: |
+          echo "Workflow-level variable: $MY_WORKFLOW_VARIABLE"
+          echo "Job-level variable: $MY_JOB_VARIABLE"
+          echo "Step-level variable: $MY_STEP_VARIABLE"
+
+      - name: Show all variable values - Step 2
+        run: |
+          echo "Workflow-level variable: $MY_WORKFLOW_VARIABLE"
+          echo "Job-level variable: $MY_JOB_VARIABLE"
+          echo "Step-level variable: $MY_STEP_VARIABLE (should be empty)"
