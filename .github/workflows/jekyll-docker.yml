@@ -41,3 +41,9 @@ jobs:
         branch: ${{ env.DEPLOY_BRANCH }}
         commit-message: Deployment Successful...
         token: ${{ secrets.MY_FIRST_SECRET }}
+
+    - name: Notify Slack
+      run: |
+       curl -X POST -H 'Content-type: application/json' \
+       --data '{"text":"This is a test Webhook..."}' \
+       ${{ secrets.SLACK_WEBHOOK_URL }}
