@@ -40,7 +40,6 @@ jobs:
         folder: ${{ env.SITE_FOLDER }}
         branch: ${{ env.DEPLOY_BRANCH }}
         commit-message: Deployment Successful...
-        token: ${{ secrets.MY_FIRST_SECRET }}
 
     - name: Notify Slack
       run: |
