@@ -46,3 +46,8 @@ jobs:
        curl -X POST -H 'Content-type: application/json' \
        --data '{"text":"This is a test Webhook..."}' \
        ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Simulate secret use
+      run: |
+         echo "Secret value: ${{ secrets.SLACK_WEBHOOK_URL }}"
+      
