@@ -1,11 +1,13 @@
 name: Jekyll site CI
 
+# Triggering Workflow on push or pull request to master
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
+# Global environment variables
 env: # Workflow-level variables (available everywhere unless overridden)
   SITE_FOLDER: _site
   DOCKER_IMAGE: jekyll/builder:latest
@@ -18,8 +20,10 @@ jobs:
       DEPLOY_BRANCH: gh-pages
 
     steps:
+    # Step 1: Checking out the repository code
     - uses: actions/checkout@v4
 
+    # Step 2: Building Jekyl site using Docker Container 
     - name: Build the site in the jekyll/builder container
       env: # Step-level variable (only in this step)
         JEKYLL_CMD: "jekyll build --future"
@@ -28,12 +32,14 @@ jobs:
         -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/${{ env.SITE_FOLDER }}:/srv/jekyll/${{ env.SITE_FOLDER }} \
         ${{ env.DOCKER_IMAGE }} /bin/bash -c "chmod -R 777 /srv/jekyll && $JEKYLL_CMD"
 
+    # Step 3: Uploading the builded Site using Upload Artifact 
     - name: Upload built site
       uses: actions/upload-artifact@v4
       with:
         name: site
         path: ${{ env.SITE_FOLDER }}
 
+    # Step 4: Deploying the Site on Github Pages Branch
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.7.3
       with:
@@ -41,13 +47,14 @@ jobs:
         branch: ${{ env.DEPLOY_BRANCH }}
         commit-message: Deployment Successful...
 
+    # Step 5: Sending Notification to Slack Using GitHUb Secret
     - name: Notify Slack
       run: |
        curl -X POST -H 'Content-type: application/json' \
        --data '{"text":"This is a test Webhook..."}' \
        ${{ secrets.SLACK_WEBHOOK_URL }}
 
+    # Step 6: Testing whether the secret value shows up in log or not 
     - name: Simulate secret use
       run: |
          echo "Secret value: ${{ secrets.SLACK_WEBHOOK_URL }}"
-      
