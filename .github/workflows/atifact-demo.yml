@@ -1,10 +1,10 @@
 name: Artifact Demo
 
-on: 
- workflow_dispatch:
+on:
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,9 +16,23 @@ jobs:
           mkdir output
           echo "This is a test file." > output/test.txt
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Compress artifact
+        run: |
+          zip -r output.zip output/
+
+      - name: Create GitHub release
+        id: create_release
+        uses: softprops/action-gh-release@v2
         with:
-          name: test-artifact
-          path: output/
-          retention-days: 7  # optional: default is 90 days
+          tag_name: v1.0.0
+          name: Release v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          files: output.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
