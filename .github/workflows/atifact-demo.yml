@@ -11,11 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build project
-        run: |
-          mkdir output
-          echo "This is a test file." > output/test.txt
-
       - name: Compress artifact
         run: |
           zip -r output.zip output/
